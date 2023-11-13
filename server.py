@@ -69,6 +69,8 @@ if __name__ == "__main__":
         help="choose which device to host the model: cpu, cuda, cuda:xxx, or auto",
     )
     parser.add_argument("--load_in_8bit", type=bool, default=False)
+    parser.add_argument("--load_in_4bit", type=bool, default=False)
+    parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
     model = LlamaForCausalLM.from_pretrained(
         args.model,
@@ -76,7 +78,8 @@ if __name__ == "__main__":
         device_map=args.device,
         torch_dtype=torch.bfloat16 if args.device == "cpu" else torch.float16,
         load_in_8bit=args.load_in_8bit,
+        load_in_4bit=args.load_in_4bit,
     )
     tokenizer = LlamaTokenizer.from_pretrained(args.model, use_fast=False)
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=args.port)
